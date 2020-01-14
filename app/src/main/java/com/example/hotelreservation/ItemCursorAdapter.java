@@ -67,7 +67,11 @@ public class ItemCursorAdapter extends CursorAdapter {
         if(totals.moveToFirst()) {
             roomsTotal = totals.getString(totals.getColumnIndexOrThrow("RoomsTotal"));
             guestsTotal = totals.getString(totals.getColumnIndexOrThrow("GuestsTotal"));
+        } else {
+            roomsTotal = "0";
+            guestsTotal = "0";
         }
+
         roomsTaken.setText(roomsTotal);
         currentGuests.setText(guestsTotal);
 

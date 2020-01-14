@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     ItemCursorAdapter itemAdaptor;
     public static final String TAG = "MainActivity";
+    EditText roomsInput, guestsInput;
+    public static final int MAX_CAPACITY = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
         listView = findViewById(R.id.ListView);
         listView.setAdapter(itemAdaptor);
 
-        final EditText roomsInput = findViewById(R.id.etRoomNo);
-        final EditText guestsInput = findViewById(R.id.etGuestNo);
+        roomsInput = findViewById(R.id.etRoomNo);
+        guestsInput = findViewById(R.id.etGuestNo);
         Button btnBook = findViewById(R.id.btnBook);
 
         updateViews();
@@ -50,20 +53,35 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // create content values reading to insert into db
                 ContentValues contentValues = new ContentValues();
+                TextView roomsTaken = findViewById(R.id.textRooms);
 
                 // collect user inputs
                 String roomsInputStr = roomsInput.getText().toString();
                 String guestsInputStr = guestsInput.getText().toString();
+                String roomsTakenStr = roomsTaken.getText().toString();
 
-                // store booking details
-                contentValues.put(TaskScheme.NO_OF_ROOMS, Integer.valueOf(roomsInputStr));
-                contentValues.put(TaskScheme.NO_OF_GUESTS, Integer.valueOf(guestsInputStr));
+                // convert to int
+                int roomsInputInt = Integer.valueOf(roomsInputStr);
+                int guestsInputInt = Integer.valueOf(guestsInputStr);
+                int roomsTakenInt = Integer.valueOf(roomsTaken.getText().toString());
 
-                // insert booking into database
-                db.addBooking(contentValues);
-                loadBookings();
-                updateViews();
+                if ((roomsTakenInt + roomsInputInt) <= MAX_CAPACITY) {
 
+                    // store booking details
+                    contentValues.put(TaskScheme.NO_OF_ROOMS, roomsInputInt);
+                    contentValues.put(TaskScheme.NO_OF_GUESTS, guestsInputInt);
+
+                    // insert booking into database
+                    db.addBooking(contentValues);
+                    loadBookings();
+                    updateViews();
+                    roomsInput.setText("");
+                    guestsInput.setText("");
+                } else if (roomsInputInt == 0 || roomsTakenStr.equalsIgnoreCase("")) {
+                    Toast.makeText(MainActivity.this, "You need to book at least 1 room.", Toast.LENGTH_SHORT).show();
+                } else if ((roomsTakenInt + roomsInputInt) > MAX_CAPACITY) {
+                    Toast.makeText(MainActivity.this, "Number of rooms taken cannot exceed 100.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -88,7 +106,11 @@ public class MainActivity extends AppCompatActivity {
         if(totals.moveToFirst()) {
             roomsTotal = totals.getString(totals.getColumnIndexOrThrow("RoomsTotal"));
             guestsTotal = totals.getString(totals.getColumnIndexOrThrow("GuestsTotal"));
+        } else {
+            roomsTotal = "0";
+            guestsTotal = "0";
         }
+
         roomsTaken.setText(roomsTotal);
         currentGuests.setText(guestsTotal);
 
