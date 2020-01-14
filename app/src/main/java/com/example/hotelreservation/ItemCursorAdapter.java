@@ -1,6 +1,8 @@
 package com.example.hotelreservation;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,9 +17,11 @@ import com.example.hotelreservation.Provider.TasksDBHelper;
 
 public class ItemCursorAdapter extends CursorAdapter {
     TasksDBHelper db;
+    Context myContext;
 
     public ItemCursorAdapter(Context context, Cursor c, int flags, TasksDBHelper db) {
         super(context, c, flags);
+        myContext = context;
         this.db = db;
     }
 
@@ -40,10 +44,9 @@ public class ItemCursorAdapter extends CursorAdapter {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d(MainActivity.TAG, "onClick: delete btn clicked");
-//                updateViews(v, id);
-                Log.d(MainActivity.TAG, "onClick: updated delete views");
+
                 deleteShape(id);
+                updateViews();
             }
         });
     }
@@ -53,22 +56,21 @@ public class ItemCursorAdapter extends CursorAdapter {
         changeCursor(db.getAllBookings());
     }
 
-//    private void updateViews(View v, String id) {
-//        TextView roomsTaken = v.findViewById(R.id.textRooms);
-//        TextView currentGuests = v.findViewById(R.id.textGuests);
-//        Log.d(MainActivity.TAG, "updateViews: got views");
-//
-//        Cursor currentBooking = db.getBooking(Integer.parseInt(id));
-//        Log.d(MainActivity.TAG, "updateViews: getting booking");
-//
-//        int roomsTakenInt = Integer.parseInt(roomsTaken.getText().toString());
-//        int currentGuestsInt = Integer.parseInt(currentGuests.getText().toString());
-//
-//        int bookingRooms = Integer.parseInt(currentBooking.getString(currentBooking.getColumnIndexOrThrow(TaskScheme.NO_OF_ROOMS)));
-//        int bookingGuests = Integer.parseInt(currentBooking.getString(currentBooking.getColumnIndexOrThrow(TaskScheme.NO_OF_GUESTS)));
-//
-//        roomsTaken.setText(roomsTakenInt - bookingRooms);
-//        currentGuests.setText(currentGuestsInt - bookingGuests);
-//
-//    }
+    private void updateViews() {
+        TextView roomsTaken = ((Activity)myContext).findViewById(R.id.textRooms);
+        TextView currentGuests = ((Activity)myContext).findViewById(R.id.textGuests);
+
+        String roomsTotal = "";
+        String guestsTotal = "";
+
+        Cursor totals = db.getTotals();
+        if(totals.moveToFirst()) {
+            roomsTotal = totals.getString(totals.getColumnIndexOrThrow("RoomsTotal"));
+            guestsTotal = totals.getString(totals.getColumnIndexOrThrow("GuestsTotal"));
+        }
+        roomsTaken.setText(roomsTotal);
+        currentGuests.setText(guestsTotal);
+
+    }
+
 }

@@ -5,7 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.service.autofill.TextValueSanitizer;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.example.hotelreservation.MainActivity;
 
@@ -54,13 +56,6 @@ public class TasksDBHelper extends SQLiteOpenHelper {
         Cursor reservations = db.rawQuery("select * from " + TaskScheme.TABLE_NAME, null);
         return reservations;
 
-    }
-
-    public Cursor getBooking(int taskId) {
-        SQLiteDatabase db = getReadableDatabase();
-        String query = "select * from " + TaskScheme.TABLE_NAME + " where _id=?";
-        Cursor cursor = db.rawQuery(query, new String[] {Integer.toString(taskId)});
-        return cursor;
     }
 
     public Cursor getTotals() {

@@ -1,6 +1,10 @@
 package com.example.hotelreservation;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -23,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     ListView listView;
     ItemCursorAdapter itemAdaptor;
     public static final String TAG = "MainActivity";
-    public static final String SP_FILE_NAME = "BookinggNumbers";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,21 +43,7 @@ public class MainActivity extends AppCompatActivity {
         final EditText guestsInput = findViewById(R.id.etGuestNo);
         Button btnBook = findViewById(R.id.btnBook);
 
-        TextView roomsTaken = findViewById(R.id.textRooms);
-        TextView currentGuests = findViewById(R.id.textGuests);
-
-        String roomsTotal = "";
-        String guestsTotal = "";
-
-        Cursor totals = db.getTotals();
-        if(totals.moveToFirst()) {
-            roomsTotal = totals.getString(totals.getColumnIndexOrThrow("RoomsTotal"));
-            guestsTotal = totals.getString(totals.getColumnIndexOrThrow("GuestsTotal"));
-        }
-        roomsTaken.setText(roomsTotal);
-        currentGuests.setText(guestsTotal);
-
-        Log.d(TAG, "onCreate: " + roomsTotal + " " + guestsTotal);
+        updateViews();
 
         btnBook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,7 +61,6 @@ public class MainActivity extends AppCompatActivity {
 
                 // insert booking into database
                 db.addBooking(contentValues);
-
                 loadBookings();
                 updateViews();
 
@@ -89,21 +78,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateViews() {
-//        // get registered rooms and guests
         TextView roomsTaken = findViewById(R.id.textRooms);
         TextView currentGuests = findViewById(R.id.textGuests);
 
-//        // convert registered rooms and guests to int
-//        int roomsTakenInt = Integer.parseInt(roomsTaken.getText().toString());
-//        int currentGuestsInt = Integer.parseInt(currentGuests.getText().toString());
-//
-//        // get updated totals
-//        int totalRooms = roomsTakenInt + Integer.parseInt(int1);
-//        int totalGuests = currentGuestsInt + Integer.parseInt(int2);
-//
-//        // update totals to text views
-//        roomsTaken.setText(String.valueOf(totalRooms));
-//        currentGuests.setText(String.valueOf(totalGuests));
         String roomsTotal = "";
         String guestsTotal = "";
 
@@ -116,5 +93,6 @@ public class MainActivity extends AppCompatActivity {
         currentGuests.setText(guestsTotal);
 
     }
+
 
 }
