@@ -22,10 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:text="0"
         android:textSize="30sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/tvRooms"
-        app:layout_constraintStart_toEndOf="@+id/tvRooms"
-        tools:text="0" />
+        app:layout_constraintStart_toEndOf="@+id/tvRooms" />
 
     <TextView
         android:id="@+id/tvGuests"
@@ -43,10 +43,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:text="0"
         android:textSize="30sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/tvGuests"
-        app:layout_constraintStart_toEndOf="@+id/tvGuests"
-        tools:text="0" />
+        app:layout_constraintStart_toEndOf="@+id/tvGuests" />
 
     <View
         android:id="@+id/divider"
@@ -134,8 +134,8 @@
 
     <ListView
         android:id="@+id/ListView"
-        android:layout_width="395dp"
-        android:layout_height="338dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"

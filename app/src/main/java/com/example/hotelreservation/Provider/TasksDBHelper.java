@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import com.example.hotelreservation.MainActivity;
 
 public class TasksDBHelper extends SQLiteOpenHelper {
     Context myContext;
@@ -15,8 +18,8 @@ public class TasksDBHelper extends SQLiteOpenHelper {
         "CREATE TABLE " +
                 TaskScheme.TABLE_NAME + " (" +
                 TaskScheme.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                TaskScheme.NO_OF_ROOMS + " TEXT, " +
-                TaskScheme.NO_OF_GUESTS + " TEXT);";
+                TaskScheme.NO_OF_ROOMS + " INT, " +
+                TaskScheme.NO_OF_GUESTS + " INT);";
 
     public TasksDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -58,5 +61,16 @@ public class TasksDBHelper extends SQLiteOpenHelper {
         String query = "select * from " + TaskScheme.TABLE_NAME + " where _id=?";
         Cursor cursor = db.rawQuery(query, new String[] {Integer.toString(taskId)});
         return cursor;
+    }
+
+    public Cursor getTotals() {
+        int sum = 0;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor totals = db.rawQuery("SELECT Sum (" + (TaskScheme.NO_OF_ROOMS) + ") as RoomsTotal, " +
+                "Sum (" + (TaskScheme.NO_OF_GUESTS) + ") as GuestsTotal FROM " + TaskScheme.TABLE_NAME, null);
+//        if(totals.moveToFirst()) {
+//            sum = totals.getInt(totals.getColumnIndex("RoomsTotal"));
+//        }
+        return totals;
     }
 }
