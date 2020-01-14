@@ -59,13 +59,9 @@ public class TasksDBHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getTotals() {
-        int sum = 0;
         SQLiteDatabase db = getReadableDatabase();
         Cursor totals = db.rawQuery("SELECT Sum (" + (TaskScheme.NO_OF_ROOMS) + ") as RoomsTotal, " +
                 "Sum (" + (TaskScheme.NO_OF_GUESTS) + ") as GuestsTotal FROM " + TaskScheme.TABLE_NAME, null);
-//        if(totals.moveToFirst()) {
-//            sum = totals.getInt(totals.getColumnIndex("RoomsTotal"));
-//        }
         return totals;
     }
 }
