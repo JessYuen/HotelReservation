@@ -5,9 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.service.autofill.TextValueSanitizer;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.example.hotelreservation.MainActivity;
 
@@ -20,8 +18,9 @@ public class TasksDBHelper extends SQLiteOpenHelper {
         "CREATE TABLE " +
                 TaskScheme.TABLE_NAME + " (" +
                 TaskScheme.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                TaskScheme.NO_OF_ROOMS + " INT, " +
-                TaskScheme.NO_OF_GUESTS + " INT);";
+                TaskScheme.NO_OF_ROOMS + " INTEGER, " +
+                TaskScheme.NO_OF_GUESTS + " INTEGER, " +
+                TaskScheme.TIMESTAMP + " TEXT);";
 
     public TasksDBHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -35,11 +34,13 @@ public class TasksDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
     }
 
     public void addBooking(ContentValues contentValues) {
         SQLiteDatabase db = getWritableDatabase();
         db.insert(TaskScheme.TABLE_NAME, null, contentValues);
+        Log.d(MainActivity.TAG, String.valueOf(contentValues));
         db.close();
     }
 
@@ -58,10 +59,31 @@ public class TasksDBHelper extends SQLiteOpenHelper {
 
     }
 
-    public Cursor getTotals() {
+    public int getRoomTotal() {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor totals = db.rawQuery("SELECT Sum (" + (TaskScheme.NO_OF_ROOMS) + ") as RoomsTotal, " +
-                "Sum (" + (TaskScheme.NO_OF_GUESTS) + ") as GuestsTotal FROM " + TaskScheme.TABLE_NAME, null);
-        return totals;
+        Cursor totals = db.rawQuery("SELECT SUM(" + TaskScheme.NO_OF_ROOMS + ") as Total FROM " + TaskScheme.TABLE_NAME, null);
+        Log.d(MainActivity.TAG, "getTotals: got totals");
+        int sum = 0;
+
+        if(totals.moveToFirst())
+            sum= totals.getInt(totals.getColumnIndex("Total"));
+
+        return sum;
     }
+
+    public int getGuestTotal() {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor totals = db.rawQuery("SELECT SUM(" + TaskScheme.NO_OF_GUESTS + ") as Total FROM " + TaskScheme.TABLE_NAME, null);
+        Log.d(MainActivity.TAG, "getTotals: got totals");
+        int sum = 0;
+
+        if(totals.moveToFirst())
+            sum= totals.getInt(totals.getColumnIndex("Total"));
+
+        return sum;
+    }
+
+
+
+
 }

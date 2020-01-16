@@ -2,7 +2,6 @@ package com.example.hotelreservation;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,9 +33,13 @@ public class ItemCursorAdapter extends CursorAdapter {
     public void bindView(final View view, Context context, final Cursor cursor) {
         TextView no_of_rooms = view.findViewById(R.id.list_item_rooms);
         TextView no_of_guests = view.findViewById(R.id.list_item_guests);
+        TextView book_date = view.findViewById(R.id.list_item_date);
+
+        Log.d("Listviewdata", cursor.getString(cursor.getColumnIndexOrThrow(TaskScheme.NO_OF_ROOMS)));
 
         no_of_rooms.setText(cursor.getString(cursor.getColumnIndexOrThrow(TaskScheme.NO_OF_ROOMS)));
         no_of_guests.setText(cursor.getString(cursor.getColumnIndexOrThrow(TaskScheme.NO_OF_GUESTS)));
+        book_date.setText(cursor.getString(cursor.getColumnIndexOrThrow(TaskScheme.TIMESTAMP)));
         final String id = cursor.getString(cursor.getColumnIndexOrThrow(TaskScheme.ID));
 
 
@@ -60,18 +63,19 @@ public class ItemCursorAdapter extends CursorAdapter {
         TextView roomsTaken = ((Activity)myContext).findViewById(R.id.textRooms);
         TextView currentGuests = ((Activity)myContext).findViewById(R.id.textGuests);
 
-        String roomsTotal = "";
-        String guestsTotal = "";
+        String roomsTotal, guestsTotal;
+        Cursor allRecords = db.getAllBookings();
 
-        Cursor totals = db.getTotals();
-        if(totals.moveToFirst()) {
-            roomsTotal = totals.getString(totals.getColumnIndexOrThrow("RoomsTotal"));
-            guestsTotal = totals.getString(totals.getColumnIndexOrThrow("GuestsTotal"));
+
+        if (!(allRecords.getCount() == 0)) {
+            roomsTotal = String.valueOf(db.getRoomTotal());
+            guestsTotal = String.valueOf(db.getGuestTotal());
+
+
         } else {
             roomsTotal = "0";
             guestsTotal = "0";
         }
-
         roomsTaken.setText(roomsTotal);
         currentGuests.setText(guestsTotal);
 
