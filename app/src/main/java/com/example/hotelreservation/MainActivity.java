@@ -16,6 +16,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.hotelreservation.Provider.TaskScheme;
 import com.example.hotelreservation.Provider.TasksDBHelper;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity {
     TasksDBHelper db;
     ListView listView;
@@ -41,9 +45,11 @@ public class MainActivity extends AppCompatActivity {
         roomsTaken = findViewById(R.id.textRooms);
         currentGuests = findViewById(R.id.textGuests);
 
+        Log.d(TAG, "onCreate: views declared");
+
         Button btnBook = findViewById(R.id.btnBook);
 
-        updateViews();
+        updateViews(roomsTaken, currentGuests, db);
 
         btnBook.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,32 +68,29 @@ public class MainActivity extends AppCompatActivity {
                 int roomsTakenInt = Integer.valueOf(roomsTaken.getText().toString());
 
                 //String bookDate = new SimpleDateFormat("dd.MM.yyyy @ hh:mm:ss", Locale.UK).format(new Date());
-                String bookDate = "test";
-
 
                 if ((roomsTakenInt + roomsInputInt) <= MAX_CAPACITY) {
+
+                    String bookTstamp = new SimpleDateFormat("dd/mm/yyyy @ hh:mm:ss", Locale.UK).format(new Date());
 
                     // store booking details
                     contentValues.put(TaskScheme.NO_OF_ROOMS, roomsInputInt);
                     contentValues.put(TaskScheme.NO_OF_GUESTS, guestsInputInt);
-                    contentValues.put(TaskScheme.TIMESTAMP, bookDate);
-
-                    Log.d(TAG, "onClick: stored into contentvalues" + bookDate);
+                    contentValues.put(TaskScheme.TIMESTAMP, bookTstamp);
 
 
                     // insert booking into database
                     db.addBooking(contentValues);
-                    Log.d(TAG, "onClick: booking added");
                     loadBookings();
-                    updateViews();
+                    updateViews(roomsTaken, currentGuests, db);
                     roomsInput.setText("");
                     guestsInput.setText("");
 
-                    Log.d(TAG, "onClick: updated");
                 } else if (roomsInputInt == 0) {
                     Toast.makeText(MainActivity.this, "You need to book at least 1 room.", Toast.LENGTH_SHORT).show();
                 } else if ((roomsTakenInt + roomsInputInt) > MAX_CAPACITY) {
                     Toast.makeText(MainActivity.this, "Number of rooms taken cannot exceed 100.", Toast.LENGTH_SHORT).show();
+                    roomsInput.setText("");
                 }
             }
         });
@@ -99,31 +102,22 @@ public class MainActivity extends AppCompatActivity {
     private void loadBookings() {
         //Cursor is a temporary buffer area which stores results from a SQLiteDataBase query.
         Cursor cursor = db.getAllBookings();
-        Log.d(TAG, String.valueOf(cursor));
         itemAdaptor.changeCursor(cursor);
-        itemAdaptor.notifyDataSetChanged();
-        //Log.d(TAG, "loadBookings: bookings loaded");
+        Log.d(TAG, "loadBookings: bookings loaded " + cursor.getCount());
     }
 
-    private void updateViews() {
+    public static void updateViews(TextView tv1, TextView tv2, TasksDBHelper db) {
         String roomsTotal, guestsTotal;
-        Cursor allRecords = db.getAllBookings();
 
-        Log.d(TAG, "updateViews: number of rows = " + allRecords.getCount());
+        Cursor totals = db.getTotals();
 
-        if (!(allRecords.getCount() == 0)) {
-            Log.d(TAG, "updateViews: not null");
-            roomsTotal = String.valueOf(db.getRoomTotal());
-            guestsTotal = String.valueOf(db.getGuestTotal());
-            Log.d(TAG, "updateViews: got strings");
+        totals.moveToFirst();
+        roomsTotal = totals.getString(totals.getColumnIndexOrThrow("RoomsTotal"));
+        guestsTotal = totals.getString(totals.getColumnIndexOrThrow("GuestsTotal"));
+        Log.d(TAG, "updateViews: " + roomsTotal + " " + guestsTotal);
 
-
-        } else {
-            roomsTotal = "0";
-            guestsTotal = "0";
-        }
-        roomsTaken.setText(roomsTotal);
-        currentGuests.setText(guestsTotal);
+        tv1.setText(roomsTotal);
+        tv2.setText(guestsTotal);
 
 
 

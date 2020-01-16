@@ -41,6 +41,7 @@ public class TasksDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         db.insert(TaskScheme.TABLE_NAME, null, contentValues);
         Log.d(MainActivity.TAG, String.valueOf(contentValues));
+        Log.d(MainActivity.TAG, "addBooking: booking added");
         db.close();
     }
 
@@ -54,33 +55,21 @@ public class TasksDBHelper extends SQLiteOpenHelper {
 
     public Cursor getAllBookings() {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor reservations = db.rawQuery("select * from " + TaskScheme.TABLE_NAME, null);
-        return reservations;
+        Log.d(MainActivity.TAG, "getAllBookings: getting bookings");
+        Cursor bookings = db.rawQuery("select * from " + TaskScheme.TABLE_NAME, null);
+        Log.d(MainActivity.TAG, "getAllBookings: returning bookings");
+        return bookings;
 
     }
 
-    public int getRoomTotal() {
+    public Cursor getTotals() {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor totals = db.rawQuery("SELECT SUM(" + TaskScheme.NO_OF_ROOMS + ") as Total FROM " + TaskScheme.TABLE_NAME, null);
-        Log.d(MainActivity.TAG, "getTotals: got totals");
-        int sum = 0;
+        Log.d(MainActivity.TAG, "getGuestTotal: database open");
+        Cursor totals = db.rawQuery("SELECT TOTAL(" + TaskScheme.NO_OF_ROOMS + ") AS RoomsTotal, " +
+                "TOTAL(" + TaskScheme.NO_OF_GUESTS + ") AS GuestsTotal FROM " + TaskScheme.TABLE_NAME,
+                null);
 
-        if(totals.moveToFirst())
-            sum= totals.getInt(totals.getColumnIndex("Total"));
-
-        return sum;
-    }
-
-    public int getGuestTotal() {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor totals = db.rawQuery("SELECT SUM(" + TaskScheme.NO_OF_GUESTS + ") as Total FROM " + TaskScheme.TABLE_NAME, null);
-        Log.d(MainActivity.TAG, "getTotals: got totals");
-        int sum = 0;
-
-        if(totals.moveToFirst())
-            sum= totals.getInt(totals.getColumnIndex("Total"));
-
-        return sum;
+        return totals;
     }
 
 
